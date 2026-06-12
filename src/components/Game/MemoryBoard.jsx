@@ -5,6 +5,7 @@ export const MemoryBoard = memo(function MemoryBoard({
   cards,
   flippedCardIds,
   matchedCardIds,
+  isLocked,
   onFlipCard,
 }) {
   if (cards.length === 0) {
@@ -22,6 +23,7 @@ export const MemoryBoard = memo(function MemoryBoard({
           card={card}
           isFlipped={flippedCardIds.includes(card.id)}
           isMatched={matchedCardIds.includes(card.id)}
+          isLocked={isLocked}
           key={card.id}
           onFlip={onFlipCard}
         />

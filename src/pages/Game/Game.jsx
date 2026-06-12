@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useReducer } from 'react';
 import { DifficultySelector } from '../../components/Game/DifficultySelector.jsx';
 import { GameStats } from '../../components/Game/GameStats.jsx';
 import { MemoryBoard } from '../../components/Game/MemoryBoard.jsx';
+import { VictoryModal } from '../../components/Game/VictoryModal.jsx';
 import { DIFFICULTIES } from '../../features/game/cardData.js';
 import { createDeck } from '../../features/game/createDeck.js';
 import {
@@ -42,6 +43,11 @@ export function Game() {
   }, [reset, state.difficulty]);
 
   const handleResetGame = useCallback(() => {
+    reset();
+    dispatch({ type: GAME_ACTIONS.resetGame });
+  }, [reset]);
+
+  const handleChangeDifficulty = useCallback(() => {
     reset();
     dispatch({ type: GAME_ACTIONS.resetGame });
   }, [reset]);
@@ -118,23 +124,34 @@ export function Game() {
           />
         </aside>
 
-        <div className="board-shell">
-          {state.status === GAME_STATUS.won && (
-            <section className="win-banner" role="status" aria-live="polite">
-              <p className="panel-label">Victoria</p>
-              <h2>Arena completada</h2>
-              <p>
-                Has encontrado todas las parejas en {state.moves} movimientos y {seconds} segundos.
-              </p>
-            </section>
-          )}
+        <div className={`board-shell board-shell--${state.status}`}>
+          <section className="game-state-banner" aria-live="polite">
+            <span>{selectedDifficulty.label}</span>
+            <strong>
+              {state.status === GAME_STATUS.idle && 'Partida no iniciada'}
+              {state.status === GAME_STATUS.playing && 'Partida en curso'}
+              {state.status === GAME_STATUS.checking && 'Comprobando jugada'}
+              {state.status === GAME_STATUS.won && 'Partida finalizada'}
+            </strong>
+          </section>
 
           <MemoryBoard
             cards={state.cards}
             flippedCardIds={state.flippedCardIds}
             matchedCardIds={state.matchedCardIds}
+            isLocked={state.status !== GAME_STATUS.playing}
             onFlipCard={handleFlipCard}
           />
+
+          {state.status === GAME_STATUS.won && (
+            <VictoryModal
+              difficulty={selectedDifficulty.label}
+              moves={state.moves}
+              seconds={seconds}
+              onPlayAgain={handleStartGame}
+              onChangeDifficulty={handleChangeDifficulty}
+            />
+          )}
         </div>
       </div>
     </section>

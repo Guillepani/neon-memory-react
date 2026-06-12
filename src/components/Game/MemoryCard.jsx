@@ -1,11 +1,26 @@
 import { memo } from 'react';
 
-export const MemoryCard = memo(function MemoryCard({ card, isFlipped, isMatched, onFlip }) {
+export const MemoryCard = memo(function MemoryCard({
+  card,
+  isFlipped,
+  isMatched,
+  isLocked,
+  onFlip,
+}) {
   const isVisible = isFlipped || isMatched;
+  const isDisabled = isVisible || isLocked;
+  const cardClassName = [
+    'memory-card',
+    `memory-card--${card.tone}`,
+    isVisible ? 'memory-card--flipped' : '',
+    isMatched ? 'memory-card--matched' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <button
-      className={`memory-card memory-card--${card.tone} ${isVisible ? 'memory-card--flipped' : ''}`}
+      className={cardClassName}
       type="button"
       onClick={() => onFlip(card.id)}
       aria-label={
@@ -14,7 +29,7 @@ export const MemoryCard = memo(function MemoryCard({ card, isFlipped, isMatched,
           : 'Carta oculta. Girar carta'
       }
       aria-pressed={isVisible}
-      disabled={isMatched}
+      disabled={isDisabled}
     >
       <span className="memory-card__inner" aria-hidden="true">
         <span className="memory-card__face memory-card__face--back">

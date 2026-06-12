@@ -1,0 +1,42 @@
+.instructions-page {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.steps-list {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 48rem;
+  margin: 0;
+  padding: 0;
+  counter-reset: steps;
+  list-style: none;
+}
+
+.steps-list li {
+  position: relative;
+  padding: var(--space-4) var(--space-4) var(--space-4) 4.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text);
+  line-height: 1.6;
+  counter-increment: steps;
+}
+
+.steps-list li::before {
+  position: absolute;
+  top: 50%;
+  left: var(--space-4);
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  box-shadow: var(--shadow-neon-magenta);
+  color: var(--color-text);
+  content: counter(steps);
+  font-weight: 900;
+  transform: translateY(-50%);
+}

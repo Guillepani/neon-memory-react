@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useCallback } from 'react';
 import { DIFFICULTY_LIST } from '../../features/game/cardData.js';
 
 export const DifficultySelector = memo(function DifficultySelector({
@@ -6,6 +6,14 @@ export const DifficultySelector = memo(function DifficultySelector({
   isPlaying,
   onSelectDifficulty,
 }) {
+  const handleDifficultyClick = useCallback((event) => {
+    const difficulty = event.currentTarget.dataset.difficulty;
+
+    if (difficulty) {
+      onSelectDifficulty(difficulty);
+    }
+  }, [onSelectDifficulty]);
+
   return (
     <section className="game-panel" aria-labelledby="difficulty-title">
       <div>
@@ -23,7 +31,8 @@ export const DifficultySelector = memo(function DifficultySelector({
             }
             type="button"
             key={difficulty.id}
-            onClick={() => onSelectDifficulty(difficulty.id)}
+            onClick={handleDifficultyClick}
+            data-difficulty={difficulty.id}
             aria-pressed={difficulty.id === selectedDifficulty}
             disabled={isPlaying}
           >

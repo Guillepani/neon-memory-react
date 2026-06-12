@@ -19,12 +19,26 @@ export function Game() {
   const { seconds, start, pause, reset } = useTimer();
   const isPlaying = state.status === GAME_STATUS.playing || state.status === GAME_STATUS.checking;
   const hasStarted = state.status !== GAME_STATUS.idle;
-  const selectedDifficulty = DIFFICULTIES[state.difficulty];
+  const selectedDifficulty = useMemo(() => DIFFICULTIES[state.difficulty], [state.difficulty]);
   const totalPairs = selectedDifficulty.pairs;
   const matchedPairs = useMemo(
     () => state.matchedCardIds.length / 2,
     [state.matchedCardIds.length],
   );
+  const boardClassName = useMemo(
+    () => `board-shell board-shell--${state.status}`,
+    [state.status],
+  );
+  const gameStatusLabel = useMemo(() => {
+    const labels = {
+      [GAME_STATUS.idle]: 'Partida no iniciada',
+      [GAME_STATUS.playing]: 'Partida en curso',
+      [GAME_STATUS.checking]: 'Comprobando jugada',
+      [GAME_STATUS.won]: 'Partida finalizada',
+    };
+
+    return labels[state.status];
+  }, [state.status]);
 
   const handleSelectDifficulty = useCallback((difficulty) => {
     reset();
@@ -124,15 +138,10 @@ export function Game() {
           />
         </aside>
 
-        <div className={`board-shell board-shell--${state.status}`}>
+        <div className={boardClassName}>
           <section className="game-state-banner" aria-live="polite">
             <span>{selectedDifficulty.label}</span>
-            <strong>
-              {state.status === GAME_STATUS.idle && 'Partida no iniciada'}
-              {state.status === GAME_STATUS.playing && 'Partida en curso'}
-              {state.status === GAME_STATUS.checking && 'Comprobando jugada'}
-              {state.status === GAME_STATUS.won && 'Partida finalizada'}
-            </strong>
+            <strong>{gameStatusLabel}</strong>
           </section>
 
           <MemoryBoard

@@ -1,35 +1,40 @@
-import { memo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 
 export const MemoryCard = memo(function MemoryCard({
   card,
   isFlipped,
   isMatched,
-  isLocked,
   onFlip,
 }) {
   const isVisible = isFlipped || isMatched;
-  const isDisabled = isVisible || isLocked;
-  const cardClassName = [
-    'memory-card',
-    `memory-card--${card.tone}`,
-    isVisible ? 'memory-card--flipped' : '',
-    isMatched ? 'memory-card--matched' : '',
-  ]
-    .filter(Boolean)
-    .join(' ');
+  const cardClassName = useMemo(
+    () =>
+      [
+        'memory-card',
+        `memory-card--${card.tone}`,
+        isVisible ? 'memory-card--flipped' : '',
+        isMatched ? 'memory-card--matched' : '',
+      ]
+        .filter(Boolean)
+        .join(' '),
+    [card.tone, isMatched, isVisible],
+  );
+  const ariaLabel = useMemo(
+    () => (isVisible ? `Carta descubierta ${card.label}` : 'Carta oculta. Girar carta'),
+    [card.label, isVisible],
+  );
+  const handleClick = useCallback(() => {
+    onFlip(card.id);
+  }, [card.id, onFlip]);
 
   return (
     <button
       className={cardClassName}
       type="button"
-      onClick={() => onFlip(card.id)}
-      aria-label={
-        isVisible
-          ? `Carta descubierta ${card.label}`
-          : 'Carta oculta. Girar carta'
-      }
+      onClick={handleClick}
+      aria-label={ariaLabel}
       aria-pressed={isVisible}
-      disabled={isDisabled}
+      disabled={isVisible}
     >
       <span className="memory-card__inner" aria-hidden="true">
         <span className="memory-card__face memory-card__face--back">

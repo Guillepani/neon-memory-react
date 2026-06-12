@@ -207,6 +207,10 @@
   gap: clamp(var(--space-2), 2vw, var(--space-4));
 }
 
+.memory-board--locked {
+  pointer-events: none;
+}
+
 .memory-card {
   position: relative;
   display: block;

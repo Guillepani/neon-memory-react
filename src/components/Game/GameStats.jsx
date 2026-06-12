@@ -8,12 +8,22 @@ const STATUS_LABELS = {
   [GAME_STATUS.won]: 'Arena completada',
 };
 
-export const GameStats = memo(function GameStats({ moves, status, matchedPairs, totalPairs }) {
+export const GameStats = memo(function GameStats({
+  moves,
+  status,
+  matchedPairs,
+  totalPairs,
+  seconds,
+}) {
   return (
     <section className="stats-panel" aria-label="Estadisticas de partida">
       <article className="stat-card">
         <span>Movimientos</span>
         <strong>{moves}</strong>
+      </article>
+      <article className="stat-card">
+        <span>Tiempo</span>
+        <strong>{seconds}s</strong>
       </article>
       <article className="stat-card">
         <span>Parejas</span>

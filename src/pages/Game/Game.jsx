@@ -10,10 +10,12 @@ import {
   gameReducer,
   initialGameState,
 } from '../../features/game/gameReducer.js';
+import { useTimer } from '../../hooks/useTimer.js';
 import './Game.css';
 
 export function Game() {
   const [state, dispatch] = useReducer(gameReducer, initialGameState);
+  const { seconds, start, pause, reset } = useTimer();
   const isPlaying = state.status === GAME_STATUS.playing || state.status === GAME_STATUS.checking;
   const hasStarted = state.status !== GAME_STATUS.idle;
   const selectedDifficulty = DIFFICULTIES[state.difficulty];
@@ -24,22 +26,25 @@ export function Game() {
   );
 
   const handleSelectDifficulty = useCallback((difficulty) => {
+    reset();
     dispatch({
       type: GAME_ACTIONS.selectDifficulty,
       payload: { difficulty },
     });
-  }, []);
+  }, [reset]);
 
   const handleStartGame = useCallback(() => {
+    reset();
     dispatch({
       type: GAME_ACTIONS.startGame,
       payload: { cards: createDeck(state.difficulty) },
     });
-  }, [state.difficulty]);
+  }, [reset, state.difficulty]);
 
   const handleResetGame = useCallback(() => {
+    reset();
     dispatch({ type: GAME_ACTIONS.resetGame });
-  }, []);
+  }, [reset]);
 
   const handleFlipCard = useCallback((cardId) => {
     dispatch({
@@ -59,6 +64,16 @@ export function Game() {
 
     return () => window.clearTimeout(checkTimeout);
   }, [state.status, state.flippedCardIds]);
+
+  useEffect(() => {
+    if (state.status === GAME_STATUS.playing || state.status === GAME_STATUS.checking) {
+      start();
+      return undefined;
+    }
+
+    pause();
+    return undefined;
+  }, [pause, start, state.status]);
 
   return (
     <section className="game-page" aria-labelledby="game-title">
@@ -99,6 +114,7 @@ export function Game() {
             status={state.status}
             matchedPairs={matchedPairs}
             totalPairs={totalPairs}
+            seconds={seconds}
           />
         </aside>
 
@@ -107,7 +123,9 @@ export function Game() {
             <section className="win-banner" role="status" aria-live="polite">
               <p className="panel-label">Victoria</p>
               <h2>Arena completada</h2>
-              <p>Has encontrado todas las parejas en {state.moves} movimientos.</p>
+              <p>
+                Has encontrado todas las parejas en {state.moves} movimientos y {seconds} segundos.
+              </p>
             </section>
           )}
 
